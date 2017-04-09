@@ -116,18 +116,36 @@ bool VerboseLogging() { return !GetEnv("VERBOSE_BLAZE_CLIENT").empty(); }
 
 // Read the Jvm version from a file descriptor. The read fd
 // should contains a similar output as the java -version output.
-string ReadJvmVersion(const string& version_string) {
-  // try to look out for 'version "'
-  static const string version_pattern = "version \"";
-  size_t found = version_string.find(version_pattern);
-  if (found != string::npos) {
-    found += version_pattern.size();
-    // If we found "version \"", process until next '"'
-    size_t end = version_string.find("\"", found);
-    if (end == string::npos) {  // consider end of string as a '"'
-      end = version_string.size();
+string ReadJvmVersion(const string& version_string, DetectJvmVersion line) {
+
+  if (line == VERSION_LINE) {
+    // try to look out for 'version "'
+    static const string version_pattern = "version \"";
+    size_t found = version_string.find(version_pattern);
+    if (found != string::npos) {
+      found += version_pattern.size();
+      // If we found "version \"", process until next '"'
+      size_t end = version_string.find("\"", found);
+      if (end == string::npos) {  // consider end of string as a '"'
+        end = version_string.size();
+      }
+      return version_string.substr(found, end - found);
     }
-    return version_string.substr(found, end - found);
+  } 
+
+  if (line == ENVIRON_LINE) {
+    // otherwise, try to look out for 'Environment (build ' in the next line
+    static const string env_pattern = "Environment (build ";
+    size_t found = version_string.find(env_pattern);
+    if (found != string::npos) {
+      found += env_pattern.size();
+      // If we found "Environment (build ", process until next '-'
+      size_t end = version_string.find("-", found);
+      if (end == string::npos) {  // consider end of string as a '-'
+        end = version_string.size();
+      }
+      return version_string.substr(found, end - found);
+    }
   }
 
   return "";

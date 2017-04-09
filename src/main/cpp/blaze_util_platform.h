@@ -117,7 +117,7 @@ void ExecuteDaemon(const std::string& exe,
 // is supposed to output a string in the form '.*version ".*".*'. This method
 // will return the part in between the two quote or the empty string on failure
 // to match the good string.
-std::string GetJvmVersion(const std::string& java_exe);
+std::pair<std::string, std::string> GetJvmVersion(const std::string& java_exe);
 
 // Convert a path from Bazel internal form to underlying OS form.
 // On Unixes this is an identity operation.

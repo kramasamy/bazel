@@ -42,6 +42,8 @@ using blaze_util::die;
 using blaze_util::pdie;
 using blaze_exit_code::INTERNAL_ERROR;
 
+using std::make_pair;
+using std::pair;
 using std::string;
 using std::vector;
 
@@ -336,13 +338,15 @@ static string RunProgram(const string& exe,
   return string("");  //  We cannot reach here, just placate the compiler.
 }
 
-string GetJvmVersion(const string& java_exe) {
+pair<string, string> GetJvmVersion(const string& java_exe) {
   vector<string> args;
   args.push_back("java");
   args.push_back("-version");
 
   string version_string = RunProgram(java_exe, args);
-  return ReadJvmVersion(version_string);
+  string version_in_version_line = ReadJvmVersion(version_string, VERSION_LINE);
+  string version_in_environ_line = ReadJvmVersion(version_string, ENVIRON_LINE);
+  return make_pair(version_in_version_line, version_in_environ_line);
 }
 
 bool CompareAbsolutePaths(const string& a, const string& b) {

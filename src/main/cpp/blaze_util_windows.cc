@@ -77,6 +77,7 @@ static const size_t kWindowsPathBufferSize = 0x8010;
 using blaze_util::die;
 using blaze_util::pdie;
 
+using std::pair;
 using std::string;
 using std::unique_ptr;
 using std::wstring;
@@ -496,7 +497,7 @@ static void CreateCommandLine(CmdLine* result, const string& exe,
 
 }  // namespace
 
-string GetJvmVersion(const string& java_exe) {
+pair<string, string> GetJvmVersion(const string& java_exe) {
   // TODO(bazel-team): implement IPipe for Windows and use that here.
   HANDLE pipe_read, pipe_write;
 
@@ -565,7 +566,9 @@ string GetJvmVersion(const string& java_exe) {
   CloseHandle(pipe_read);
   CloseHandle(processInfo.hProcess);
   CloseHandle(processInfo.hThread);
-  return ReadJvmVersion(result);
+  string version_in_version_line = ReadJvmVersion(result, VERSION_LINE);
+  string version_in_environ_line = ReadJvmVersion(result, ENVIRON_LINE);
+  return make_pair<string, string>(version_in_version_line, version_in_environ_line);
 }
 
 #ifndef COMPILER_MSVC

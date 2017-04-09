@@ -569,19 +569,20 @@ static void VerifyJavaVersionAndSetJvm() {
   if (blaze_util::ReadFile(version_spec_file, &version_spec)) {
     blaze_util::StripWhitespace(&version_spec);
     // A version specification is given, get version of java.
-    string jvm_version = GetJvmVersion(exe);
+    std::pair<string, string> jvm_version = GetJvmVersion(exe);
 
     // Compare that jvm_version is found and at least the one specified.
-    if (jvm_version.size() == 0) {
+    if (jvm_version.first.size() == 0 && jvm_version.second.size() == 0) {
       die(blaze_exit_code::LOCAL_ENVIRONMENTAL_ERROR,
           "Java version not detected while at least %s is needed.\n"
           "Please set JAVA_HOME.",
           version_spec.c_str());
-    } else if (!CheckJavaVersionIsAtLeast(jvm_version, version_spec)) {
+    } else if (!CheckJavaVersionIsAtLeast(jvm_version.first, version_spec) && 
+               !CheckJavaVersionIsAtLeast(jvm_version.second, version_spec)) {
       die(blaze_exit_code::LOCAL_ENVIRONMENTAL_ERROR,
           "Java version is %s while at least %s is needed.\n"
           "Please set JAVA_HOME.",
-          jvm_version.c_str(), version_spec.c_str());
+          jvm_version.second.c_str(), version_spec.c_str());
     }
   }
 

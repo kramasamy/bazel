@@ -24,10 +24,14 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace blaze {
 
 extern const char kServerPidFile[];
+
+// Enumeration on how the jvm version is detected
+enum DetectJvmVersion { VERSION_LINE, ENVIRON_LINE };
 
 // TODO(laszlocsomor) 2016-11-21: remove kServerPidSymlink after 2017-05-01
 // (~half a year from writing this comment). By that time old Bazel clients that
@@ -74,7 +78,7 @@ bool VerboseLogging();
 // "java -version" execution and is supposed to contain a string of the form
 // 'version "version-number"' in the first 255 bytes. If the string is found,
 // version-number is returned, else the empty string is returned.
-std::string ReadJvmVersion(const std::string &version_string);
+std::string ReadJvmVersion(const std::string &version_string, DetectJvmVersion line);
 
 // Returns true iff jvm_version is at least the version specified by
 // version_spec.
